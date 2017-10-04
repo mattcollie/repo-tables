@@ -137,7 +137,7 @@ let readData = (readGitRepoData) => {
     let result = JSON.parse(readGitRepoData)
     console.log(result)
 
-    for (let x of result) {
+    for (let x of result.sort((a, b) => a.type[0]+a.name > b.type[0]+b.name )) {
         //Create TableRow and TableData Objects
         let tr = document.createElement('tr')
         let td1 = document.createElement('td')
@@ -153,18 +153,34 @@ let readData = (readGitRepoData) => {
         let td2 = document.createElement('td')
         let content2 = document.createTextNode(x.name)
 
-        if(x.type == "dir") {
-            let anchor = document.createElement('a')
-            anchor.href = `index.html?param=${x.path}`
-            anchor.appendChild(content2)
-            td2.appendChild(anchor)
+        if(x.name == ".DS_Store") {
+            td2.innerHTML = x.name
         } else {
-            td2.innerHTML = `<a href="${x.html_url}" target="_blank">${x.name}</a>`
+            if(x.type == "dir") {
+                let anchor = document.createElement('a')
+                anchor.href = `index.html?param=${x.path}`
+                anchor.appendChild(content2)
+                td2.appendChild(anchor)
+            } else {
+                td2.innerHTML = `<a href="${x.html_url}" target="_blank">${x.name}</a>`
+            }
         }
-
+ 
         //COL 3: => Get Last commit message
+
+        let rawurl = `https://raw.githubusercontent.com/${gituser}/${gitrepo}/master/${x.path}`
+
         let td3 = document.createElement('td')
-        td3.innerHTML = `<a href="${x.html_url}" target="_blank">Open on Github</a>`
+
+        if(x.name == ".DS_Store") {
+            td3.innerHTML = "DO NOT DOWNLOAD THIS FILE"
+        } else {
+            if(x.type == "dir") {
+                td3.innerHTML = `<a href="${x.html_url}" target="_blank">Open on Github</a>`
+            }else {
+                td3.innerHTML = `<a href="${rawurl}" target="_blank">Display Raw Code</a>`
+            }
+        }
 
         //COL 4: => Get Last commit date
         let td4 = document.createElement('td')
